@@ -1,0 +1,1 @@
+pdftoppm -png -r 600 $1 ./Slides/out

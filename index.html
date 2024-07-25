@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slide Show</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        img {
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain;
+        }
+    </style>
+</head>
+
+<body>
+    <img />
+</body>
+
+<script>
+    let currentIndex = 0
+    function loadSlide(index) {
+        document.querySelector("img").src = `./Slides/${slideList[index]}`
+        currentIndex = index
+    }
+    function nextSlide() {
+        if (currentIndex < slideList.length - 1) {
+            loadSlide(currentIndex + 1)
+        }
+    }
+    function prevSlide() {
+        if (currentIndex > 0) {
+            loadSlide(currentIndex - 1)
+        }
+    }
+
+
+    document.querySelector("img").onclick = nextSlide
+
+    let slideList = []
+    window.electron.on("list", (data) => {
+        slideList = data
+        loadSlide(0)
+    })
+    window.electron.send("list")
+
+    document.onkeydown = (e) => {
+        if (e.key === "ArrowRight" || e.key === " " || e.key === "Enter" || e.key === "ArrowDown") {
+            nextSlide()
+        } else if (e.key === "ArrowLeft" || e.key === "ArrowUp" || e.key === "Backspace") {
+            prevSlide()
+        } else if (e.key === "Escape") {
+            window.electron.send("exit")
+        }
+    }
+</script>
+
+</html>

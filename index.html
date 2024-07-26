@@ -26,8 +26,10 @@
 
 <script>
     let currentIndex = 0
+    let slideList = []
+
     function loadSlide(index) {
-        document.querySelector("img").src = `./Slides/${slideList[index]}`
+        document.querySelector("img").src = `./s/${slideList[index]}`
         currentIndex = index
     }
     function nextSlide() {
@@ -40,16 +42,25 @@
             loadSlide(currentIndex - 1)
         }
     }
+    function getMeta() {
+        if (slideList.length === 0)
+            fetch("./s.json").then(res => res.json()).then(data => {
+                slideList = data
+                loadSlide(0)
+            })
+        else
+            loadSlide(0)
+    }
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
 
 
     document.querySelector("img").onclick = nextSlide
-
-    let slideList = []
-    window.electron.on("list", (data) => {
-        slideList = data
-        loadSlide(0)
-    })
-    window.electron.send("list")
 
     document.onkeydown = (e) => {
         if (e.key === "ArrowRight" || e.key === " " || e.key === "Enter" || e.key === "ArrowDown") {
@@ -58,8 +69,19 @@
             prevSlide()
         } else if (e.key === "Escape") {
             window.electron.send("exit")
+        } else if (e.key === "f") {
+            toggleFullScreen()
         }
     }
+    document.onwheel = (e) => {
+        if (e.deltaY > 0) {
+            nextSlide()
+        } else {
+            prevSlide()
+        }
+    }
+
+    getMeta()
 </script>
 
 </html>
